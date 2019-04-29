@@ -105,6 +105,36 @@ SEXP tabulate(SEXP mfunc, SEXP mvec)
     return R_NilValue;
 }
 
+
+/* Compute:
+ *
+ *  FOR i = 0 TO N DO:
+ *    out[i] = sqrt(va[i] * 4.0 + vb[i] * 5.0
+ *  RETURN ouy
+ *
+ * Note: The vectorized operation are not efficient
+ * Rcpp::sqrt(4.0 * va + 5.0 * vb) is equivaent to:
+ * Rcpp::sqrt(operatior*(4.0, va) + operator*(5.0, vb))
+ * Rcpp::sqrt(operator+(operatior*(4.0, va), operator*(5.0, vb)))
+ *
+ * Every operator function call is 1 loop, so, the total number
+ * of passes over the input data is equal to:
+ *  =>  1 (SQRT Call) + 3 (Number of operators) = 4
+ *
+ * This function requires 4 for-loops over the data,
+ * thus a single for-loop is more efficient.
+ *
+ */
+RcppExport
+SEXP vectorOperations(SEXP sa, SEXP sb)
+{
+    using Vector = Rcpp::NumericVector;
+    Vector va = sa;
+    Vector vb = sb;
+    Vector result = Rcpp::sqrt(4.0 * va + 5.0 * vb);
+    return result;
+}
+
 RcppExport
 SEXP ShowNormalRandoms(SEXP s_size)
 {
