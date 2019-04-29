@@ -1,0 +1,10 @@
+*.exe 
+*.bin
+*.dll 
+*.so
+*.lib
+*.log
+build/*
+bin/*
+.RData
+.RHistory*
